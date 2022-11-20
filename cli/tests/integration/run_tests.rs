@@ -3628,6 +3628,27 @@ fn websocket_server_idletimeout() {
   assert!(child.wait().unwrap().success());
 }
 
+#[test]
+fn webtransport() {
+  let _g = util::http_server();
+
+  let script = util::testdata_path().join("run/webtransport_test.ts");
+  let root_ca = util::testdata_path().join("tls/RootCA.pem");
+  let status = util::deno_cmd()
+    .arg("test")
+    .arg("--unstable")
+    .arg("--allow-net")
+    .arg("--cert")
+    .arg(root_ca)
+    .arg(script)
+    .spawn()
+    .unwrap()
+    .wait()
+    .unwrap();
+
+  assert!(status.success());
+}
+
 itest!(auto_discover_lockfile {
   args: "run run/auto_discover_lockfile/main.ts",
   output: "run/auto_discover_lockfile/main.out",

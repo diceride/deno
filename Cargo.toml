@@ -29,6 +29,7 @@ members = [
   "ext/webidl",
   "ext/websocket",
   "ext/webstorage",
+  "ext/webtransport",
   "ext/napi",
 ]
 exclude = ["test_util/std/hash/_wasm"]

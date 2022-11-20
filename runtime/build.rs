@@ -97,6 +97,16 @@ mod not_docs {
     }
   }
 
+  impl deno_webtransport::WebTransportPermissions for Permissions {
+    fn check_net_url(
+      &mut self,
+      _url: &deno_core::url::Url,
+      _api_name: &str,
+    ) -> Result<(), deno_core::error::AnyError> {
+      unreachable!("snapshotting!")
+    }
+  }
+
   impl deno_web::TimersPermission for Permissions {
     fn allow_hrtime(&mut self) -> bool {
       unreachable!("snapshotting!")
@@ -187,6 +197,7 @@ mod not_docs {
       deno_fetch::init::<Permissions>(Default::default()),
       deno_cache::init::<SqliteBackedCache>(None),
       deno_websocket::init::<Permissions>("".to_owned(), None, None),
+      deno_webtransport::init::<Permissions>(false, "".to_owned(), None, None),
       deno_webstorage::init(None),
       deno_crypto::init(None),
       deno_webgpu::init(false),

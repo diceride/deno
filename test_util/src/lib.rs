@@ -79,6 +79,7 @@ const HTTPS_CLIENT_AUTH_PORT: u16 = 5552;
 const WS_PORT: u16 = 4242;
 const WSS_PORT: u16 = 4243;
 const WS_CLOSE_PORT: u16 = 4244;
+const WT_PORT: u16 = 4245;
 
 pub const PERMISSION_VARIANTS: [&str; 5] =
   ["read", "write", "env", "net", "run"];
@@ -321,6 +322,44 @@ async fn run_ws_close_server(addr: &SocketAddr) {
   }
 }
 
+async fn run_wt_server(addr: &SocketAddr) {
+  let cert_file = "tls/localhost.crt";
+  let key_file = "tls/localhost.key";
+  let ca_cert_file = "tls/RootCA.pem";
+
+  let tls_config =
+    get_tls_config(cert_file, key_file, ca_cert_file, Default::default())
+      .await
+      .unwrap();
+  let tls_acceptor = TlsAcceptor::from(tls_config);
+  let listener = TcpListener::bind(addr).await.unwrap();
+  println!("ready: wt"); // Eye catcher for HttpServerCount
+
+  while let Ok((stream, _addr)) = listener.accept().await {
+    let acceptor = tls_acceptor.clone();
+    tokio::spawn(async move {
+      match acceptor.accept(stream).await {
+        Ok(tls_stream) => {
+          let ws_stream_fut = accept_async(tls_stream);
+          let ws_stream = ws_stream_fut.await;
+          if let Ok(ws_stream) = ws_stream {
+            let (tx, rx) = ws_stream.split();
+            rx.forward(tx)
+              .map(|result| {
+                if let Err(e) = result {
+                  println!("Websocket server error: {:?}", e);
+                }
+              })
+              .await;
+          }
+        }
+        Err(e) => {
+          eprintln!("TLS accept error: {:?}", e);
+        }
+      }
+    });
+  }
+}
 enum SupportedHttpVersions {
   All,
   Http1Only,
@@ -1427,6 +1466,9 @@ pub async fn run_all_servers() {
   let ws_close_addr = SocketAddr::from(([127, 0, 0, 1], WS_CLOSE_PORT));
   let ws_close_server_fut = run_ws_close_server(&ws_close_addr);
 
+  let wt_addr = SocketAddr::from(([127, 0, 0, 1], WT_PORT));
+  let wt_server_fut = run_wt_server(&wt_addr);
+
   let tls_server_fut = run_tls_server();
   let tls_client_auth_server_fut = run_tls_client_auth_server();
   let client_auth_server_https_fut = wrap_client_auth_https_server();
@@ -1440,6 +1482,7 @@ pub async fn run_all_servers() {
       redirect_server_fut,
       ws_server_fut,
       wss_server_fut,
+      wt_server_fut,
       tls_server_fut,
       tls_client_auth_server_fut,
       ws_close_server_fut,

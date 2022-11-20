@@ -68,6 +68,7 @@ delete Intl.v8BreakIterator;
   const webgpu = window.__bootstrap.webgpu;
   const webSocket = window.__bootstrap.webSocket;
   const webStorage = window.__bootstrap.webStorage;
+  const webTransport = window.__bootstrap.webTransport;
   const broadcastChannel = window.__bootstrap.broadcastChannel;
   const file = window.__bootstrap.file;
   const formData = window.__bootstrap.formData;
@@ -533,7 +534,7 @@ delete Intl.v8BreakIterator;
   const unstableWindowOrWorkerGlobalScope = {
     BroadcastChannel: util.nonEnumerable(broadcastChannel.BroadcastChannel),
     WebSocketStream: util.nonEnumerable(webSocket.WebSocketStream),
-
+    WebTransport: util.nonEnumerable(webTransport.WebTransport),
     GPU: util.nonEnumerable(webgpu.GPU),
     GPUAdapter: util.nonEnumerable(webgpu.GPUAdapter),
     GPUSupportedLimits: util.nonEnumerable(webgpu.GPUSupportedLimits),

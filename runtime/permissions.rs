@@ -1656,6 +1656,16 @@ impl deno_websocket::WebSocketPermissions for Permissions {
   }
 }
 
+impl deno_webtransport::WebTransportPermissions for Permissions {
+  fn check_net_url(
+    &mut self,
+    url: &url::Url,
+    api_name: &str,
+  ) -> Result<(), AnyError> {
+    self.net.check_url(url, Some(api_name))
+  }
+}
+
 // NOTE(bartlomieju): for now, NAPI uses `--allow-ffi` flag, but that might
 // change in the future.
 impl deno_napi::NapiPermissions for Permissions {

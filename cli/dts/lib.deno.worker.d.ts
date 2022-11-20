@@ -1,10 +1,10 @@
 // Copyright 2018-2022 the Deno authors. All rights reserved. MIT license.
 
 /// <reference no-default-lib="true" />
+/// <reference lib="esnext" />
 /// <reference lib="deno.ns" />
 /// <reference lib="deno.shared_globals" />
 /// <reference lib="deno.webgpu" />
-/// <reference lib="esnext" />
 /// <reference lib="deno.cache" />
 
 /** @category Web Workers */

@@ -203,6 +203,12 @@ impl MainWorker {
         options.root_cert_store.clone(),
         options.unsafely_ignore_certificate_errors.clone(),
       ),
+      deno_webtransport::init::<Permissions>(
+        unstable,
+        options.bootstrap.user_agent.clone(),
+        options.root_cert_store.clone(),
+        options.unsafely_ignore_certificate_errors.clone(),
+      ),
       deno_webstorage::init(options.origin_storage_dir.clone()),
       deno_broadcast_channel::init(options.broadcast_channel.clone(), unstable),
       deno_crypto::init(options.seed),
